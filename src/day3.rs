@@ -7,8 +7,11 @@ pub fn solve(str: &String) {
     for line in lines {
         let (first, second) = line.split_at(line.len() / 2);
         let intersecting_chars = find_intersecting_chars(first, second);
+
         for character in intersecting_chars.chars() {
-            sum += map.get(&character).unwrap();
+            if let Some(number) = map.get(&character) {
+                sum += number;
+            }
         }
     }
     println!("Sum is {}", sum);
