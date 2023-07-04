@@ -6,9 +6,26 @@ pub fn solve(str: &String) {
     let mut sum = 0;
     for line in lines {
         let (first, second) = line.split_at(line.len() / 2);
-        let intersecting_chars = find_intersecting_chars(first, second);
+        let intersecting_chars = find_intersecting_chars_multiple(vec![&first, &second]);
 
         for character in intersecting_chars.chars() {
+            if let Some(number) = map.get(&character) {
+                sum += number;
+            }
+        }
+    }
+    println!("Sum is {}", sum);
+}
+
+pub fn solve_second(str: &String) {
+    let lines: Vec<&str> = str.lines().collect();
+    let map = get_numeric_table();
+    let groups: Vec<Vec<&str>> = lines.chunks(3).map(|chunk| chunk.to_vec()).collect();
+    let mut sum = 0;
+
+    for group in groups {
+        let char_intersect = find_intersecting_chars_multiple(group);
+        for character in char_intersect.chars() {
             if let Some(number) = map.get(&character) {
                 sum += number;
             }
@@ -35,9 +52,20 @@ fn get_numeric_table() -> HashMap<char, u32> {
     return map;
 }
 
-fn find_intersecting_chars(first: &str, second: &str) -> String {
-    let first_set: HashSet<char> = first.chars().collect();
-    let second_set: HashSet<char> = second.chars().collect();
+fn find_intersecting_chars_multiple(strings: Vec<&str>) -> String {
+    let mut sets: Vec<HashSet<char>> = Vec::new();
 
-    return first_set.intersection(&second_set).collect();
+    for string in &strings {
+        sets.push(string.chars().collect());
+    }
+
+    let mut set_to_manage: HashSet<char> = sets.pop().unwrap();
+    let mut intersection: String = String::with_capacity(strings.len());
+
+    for set in sets {
+        intersection = set_to_manage.intersection(&set).collect();
+        set_to_manage = intersection.chars().collect();
+    }
+
+    return intersection;
 }
