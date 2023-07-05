@@ -5,6 +5,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod day6;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,7 +13,7 @@ fn main() {
 
     let contents = fs::read_to_string(file_path).expect("Cannot read the file");
     
-    day5::solve(&contents, day5::CraneType::CrateMover9001);   
+    day6::solve(&contents);   
  
 }
 
