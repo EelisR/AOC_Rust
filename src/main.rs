@@ -12,7 +12,7 @@ fn main() {
 
     let contents = fs::read_to_string(file_path).expect("Cannot read the file");
     
-    day5::solve(&contents);   
+    day5::solve(&contents, day5::CraneType::CrateMover9001);   
  
 }
 

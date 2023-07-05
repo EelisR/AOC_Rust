@@ -4,6 +4,11 @@ struct Instruction {
     to: usize,
 }
 
+pub enum CraneType {
+    CrateMover9000,
+    CrateMover9001,
+}
+
 struct Stack {
     crates: Vec<char>,
 }
@@ -22,13 +27,54 @@ impl Stack {
     }
 }
 
-pub fn solve(str: &String) {
+pub fn solve(str: &String, crane: CraneType) {
     let lines = str.lines();
 
+    let (stacks_strings, instructions) = create_init(lines);
+
+    let mut stack_set = get_initial_stacks(stacks_strings);
+    let instruction_set = get_instruction_set(instructions);
+
+    move_stacks(instruction_set, &mut stack_set, crane);
+
+    for stack in stack_set.stacks {
+        print!("{}", stack.crates.last().unwrap());
+    }
+}
+
+fn move_stacks(instruction_set: Vec<Instruction>, stack_set: &mut StackSet, crane: CraneType) {
+    match crane {
+        CraneType::CrateMover9000 => {
+            for instruction in instruction_set {
+                for _ in 0..instruction.move_amount {
+                    let item = stack_set.stacks[instruction.from - 1]
+                        .pop()
+                        .expect("take crate from stack");
+                    stack_set.stacks[instruction.to - 1].push(item);
+                }
+            }
+        },
+        CraneType::CrateMover9001 => {
+            for instruction in instruction_set {
+                let mut move_stack: Vec<char> = Vec::new();
+                for _ in 0..instruction.move_amount {
+                    let item = stack_set.stacks[instruction.from - 1]
+                        .pop()
+                        .expect("take crate from stack");
+                    move_stack.push(item);
+                }
+                move_stack.reverse();
+                stack_set.stacks[instruction.to - 1].crates.extend(move_stack);
+            }
+        }
+    }
+}
+
+fn create_init(lines: std::str::Lines) -> (Vec<&str>, Vec<&str>) {
     let mut stacks_strings: Vec<&str> = Vec::new();
     let mut instructions: Vec<&str> = Vec::new();
     let mut passed = false;
-    for line in lines.clone() {
+    for line in lines {
         if line.is_empty() {
             passed = true;
             continue;
@@ -43,22 +89,7 @@ pub fn solve(str: &String) {
     for stack in &stacks_strings {
         println!("{}", stack);
     }
-
-    let mut stack_set = get_initial_stacks(stacks_strings);
-    let instruction_set = get_instruction_set(instructions);
-
-    for instruction in instruction_set {
-        for _ in 0..instruction.move_amount {
-            let item = stack_set.stacks[instruction.from - 1]
-                .pop()
-                .expect("take crate from stack");
-            stack_set.stacks[instruction.to - 1].push(item);
-        }
-    }
-
-    for stack in stack_set.stacks {
-        print!("{}", stack.crates.last().unwrap());
-    }
+    (stacks_strings, instructions)
 }
 
 fn get_instruction_set(instructions: Vec<&str>) -> Vec<Instruction> {
