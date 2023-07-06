@@ -13,7 +13,7 @@ fn main() {
     let file_path = &args[1];
 
     let contents = fs::read_to_string(file_path).expect("Cannot read the file");
-    day7::solve(&contents)    
+    day7::solve(&contents, true)    
  
 }
 

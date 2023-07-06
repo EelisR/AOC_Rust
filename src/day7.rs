@@ -58,7 +58,7 @@ const MAX_DIR_SIZE: u32 = 100000;
 const TOTAL_DISK_SPACE: u32 = 70000000;
 const SPACE_NEEDED_FOR_UPDATE: u32 = 30000000;
 
-pub fn solve(str: &str) {
+pub fn solve(str: &str, second: bool) {
     let lines = str.lines();
     let terminal_lines: Vec<TerminalLine> = lines.map(parse_line).collect();
 
@@ -68,7 +68,7 @@ pub fn solve(str: &str) {
     for line in terminal_lines {
         match line {
             TerminalLine::Input(input) => match input {
-                Input::CdInto { dir_name: dir } => stack.push(Dir::new(dir)),
+                Input::CdInto { dir_name } => stack.push(Dir::new(dir_name)),
                 Input::CdOut => {
                     let total = stack.pop().unwrap().size;
                     totals.push(total);
@@ -96,9 +96,20 @@ pub fn solve(str: &str) {
         }
     }
 
-    let total = totals.iter().filter(|&x| x < &MAX_DIR_SIZE).sum::<u32>(); 
-    print!("Total size: {}", total)
+    if second {
+        let current_available_space = TOTAL_DISK_SPACE - totals.last().unwrap();
+        println!("Current available space: {}", current_available_space);
+        let mut possible_to_delete = totals
+            .iter()
+            .filter(|&&x| x + current_available_space > SPACE_NEEDED_FOR_UPDATE)
+            .collect::<Vec<&u32>>();
+        possible_to_delete.sort();
 
+        print!("To delete: {}", possible_to_delete.first().unwrap());
+    } else {
+        let total = totals.iter().filter(|&x| x < &MAX_DIR_SIZE).sum::<u32>();
+        print!("Total size: {}", total)
+    }
 }
 
 fn parse_line(line: &str) -> TerminalLine {
