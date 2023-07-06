@@ -4,6 +4,7 @@ struct Instruction {
     to: usize,
 }
 
+
 pub enum CraneType {
     CrateMover9000,
     CrateMover9001,
