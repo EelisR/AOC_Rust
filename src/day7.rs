@@ -12,33 +12,17 @@ impl File {
 #[derive(Debug)]
 struct Dir {
     size: u32,
-    name: String,
-    children: Vec<Output>,
-}
-
-impl Dir {
-    fn new(name: String) -> Self {
-        Dir {
-            size: 0,
-            name,
-            children: vec![],
-        }
-    }
 }
 
 impl Default for Dir {
     fn default() -> Self {
-        Dir {
-            size: 0,
-            name: String::new(),
-            children: vec![],
-        }
+        Dir { size: 0 }
     }
 }
 
 #[derive(Debug)]
 enum Input {
-    CdInto { dir_name: String },
+    CdInto,
     CdOut,
     Ls,
 }
@@ -68,7 +52,7 @@ pub fn solve(str: &str, second: bool) {
     for line in terminal_lines {
         match line {
             TerminalLine::Input(input) => match input {
-                Input::CdInto { dir_name } => stack.push(Dir::new(dir_name)),
+                Input::CdInto => stack.push(Dir::default()),
                 Input::CdOut => {
                     let total = stack.pop().unwrap().size;
                     totals.push(total);
@@ -118,13 +102,13 @@ fn parse_line(line: &str) -> TerminalLine {
     let first_word = words.next().unwrap();
     match first_word {
         "$" => parse_user_command(words),
-        _ => parse_terminal_output(first_word, words),
+        _ => parse_terminal_output(first_word),
     }
 }
 
-fn parse_terminal_output(first_word: &str, mut words: std::str::SplitWhitespace) -> TerminalLine {
+fn parse_terminal_output(first_word: &str) -> TerminalLine {
     match first_word {
-        "dir" => TerminalLine::Output(Output::Dir(Dir::new(words.next().unwrap().to_string()))),
+        "dir" => TerminalLine::Output(Output::Dir(Dir::default())),
         _ => {
             let size: Result<u32, std::num::ParseIntError> = first_word.parse();
             match size {
@@ -148,8 +132,6 @@ fn parse_cd_command(mut words: std::str::SplitWhitespace) -> TerminalLine {
     let dir = words.next().unwrap();
     match dir {
         ".." => TerminalLine::Input(Input::CdOut),
-        _ => TerminalLine::Input(Input::CdInto {
-            dir_name: dir.to_string(),
-        }),
+        _ => TerminalLine::Input(Input::CdInto),
     }
 }
