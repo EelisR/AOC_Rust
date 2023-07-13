@@ -8,13 +8,14 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     let file_path = &args[1];
 
     let contents = fs::read_to_string(file_path).expect("Cannot read the file");
-    day8::solve(&contents)    
+    day9::solve(&contents)    
  
 }
 
